@@ -16,9 +16,12 @@ type Conf struct {
 
 // NewConf creates homeconf instance
 func NewConf(filename string) (*Conf, error) {
-	ensure(filename)
+	fullFilename, e := ensure(filename)
+	if e != nil {
+		return nil, e
+	}
 	return &Conf{
-		filename: filename,
+		filename: fullFilename,
 	}, nil
 }
 
@@ -35,12 +38,12 @@ func (c *Conf) Read(out interface{}) error {
 	return nil
 }
 
-// ensure is called to ensure file existence
-func ensure(filename string) error {
+// ensure is called to ensure file existence. return file name with full paths
+func ensure(filename string) (string, error) {
 	confPath, e := os.UserHomeDir()
 	if e != nil {
 		log.Fatal("unable to get home directory")
-		return e
+		return "", e
 	}
 
 	confFileName := fmt.Sprintf(`%s%s%s`, confPath, string(os.PathSeparator), filename)
@@ -48,9 +51,9 @@ func ensure(filename string) error {
 	log.Printf("ensuring %s\n", confFileName)
 	fd, e := os.OpenFile(confFileName, os.O_RDONLY|os.O_CREATE, 0666)
 	if e != nil {
-		return e
+		return "", e
 	}
 	defer fd.Close()
 
-	return nil
+	return confFileName, nil
 }
