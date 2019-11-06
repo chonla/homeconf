@@ -45,6 +45,7 @@ func ensure(filename string) error {
 
 	confFileName := fmt.Sprintf(`%s%s%s`, confPath, string(os.PathSeparator), filename)
 
+	log.Printf("ensuring %s\n", confFileName)
 	fd, e := os.OpenFile(confFileName, os.O_RDONLY|os.O_CREATE, 0666)
 	if e != nil {
 		return e
