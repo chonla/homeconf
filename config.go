@@ -25,6 +25,7 @@ func NewConf(filename string) (*Conf, error) {
 	}, nil
 }
 
+// Read to read configuration and unmarshal it to given interface
 func (c *Conf) Read(out interface{}) error {
 	b, e := ioutil.ReadFile(c.filename)
 	if e != nil {
@@ -32,10 +33,18 @@ func (c *Conf) Read(out interface{}) error {
 	}
 
 	e = yaml.Unmarshal(b, out)
+	return e
+}
+
+// Write to write interface to configuration file
+func (c *Conf) Write(in interface{}) error {
+	b, e := yaml.Marshal(in)
 	if e != nil {
 		return e
 	}
-	return nil
+
+	e = ioutil.WriteFile(c.filename, b, 0666)
+	return e
 }
 
 // ensure is called to ensure file existence. return file name with full paths
